@@ -1,0 +1,116 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background:black;
+  flex-wrap: wrap;
+
+}
+
+/* Logo */
+
+.logo img {
+  height: auto; /* Maintain aspect ratio */
+  width: 150px; /* Set a reasonable default width */
+  max-width: 100%; /* Ensure it doesn't overflow */
+  object-fit: contain; /* Ensure the entire logo is visible */
+}
+
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  padding: 5px;
+  border-radius: 30px;
+  width: 100%; /* Adjust size */
+  max-width: 600px; /* Limit max size */
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 5px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.search-bar button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+  padding: 5px;
+}
+
+/* Navigation Links */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  
+}
+
+.nav-links li {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links a, .signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+}
+.signin-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: white; /* Match link color */
+  font-size: 18px;
+  padding: 8px 16px;
+  border: 2px solid transparent; /* Optional border for hover effect */
+  background: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .search-bar {
+    width: 50%; /* Make search bar larger on medium screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logo {
+    margin-bottom: 10px;
+  }
+
+  .search-bar {
+    width: 80%; /* Expand search bar on small screens */
+    margin: 10px 0;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    display: none; /* Hide menu by default */
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-links.show {
+    display: flex; /* Show menu when toggled */
+  }
+}
