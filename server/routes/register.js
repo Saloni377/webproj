@@ -1,32 +1,52 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
 const router = express.Router();
-const db = require("../db"); // Import database connection
+const bcrypt = require("bcryptjs");
+const db = require("../db");
 
-// User registration route
-router.post("/register", (req, res) => {
-  const { name, phone, email, address, password } = req.body;
+// Register Route
+router.post("/", (req, res) => {
+  console.log("Received Request Body:", req.body); // ✅ Log request body
 
-  if (!name || !phone || !email || !address || !password) {
+  const { userName, userPhoneNumber, userEmail, userAddress, userPassword } = req.body;
+
+  if (!userName?.trim() || !userPhoneNumber?.trim() || !userEmail?.trim() || !userAddress?.trim() || !userPassword?.trim()) {
     return res.status(400).json({ error: "All fields are required" });
   }
+  
 
-  // Hash the password before storing
-  bcrypt.hash(password, 10, (err, hashedPassword) => {
+  // Check if the email is already registered
+  const checkEmailQuery = "SELECT * FROM User WHERE userEmail = ?";
+  db.query(checkEmailQuery, [userEmail], (err, results) => {
     if (err) {
-      console.error("Error hashing password:", err);
-      return res.status(500).json({ error: "Error hashing password" });
+      console.error("Database error:", err.message);
+      return res.status(500).json({ error: "Database error" });
     }
 
-    const query =
-      "INSERT INTO users (name, phone, email, address, password) VALUES (?, ?, ?, ?, ?)";
+    if (results.length > 0) {
+      return res.status(400).json({ error: "Email is already registered" });
+    }
 
-    db.query(query, [name, phone, email, address, hashedPassword], (err, result) => {
+    // Hash the password
+    bcrypt.hash(userPassword, 10, (err, hashedPassword) => {
       if (err) {
-        console.error("Error registering user:", err.sqlMessage);
-        return res.status(500).json({ error: err.sqlMessage });
+        console.error("Error hashing password:", err.message);
+        return res.status(500).json({ error: "Error hashing password" });
       }
-      res.json({ success: true, message: "User registered successfully!" });
+
+      // Insert the new user
+      const query = `
+        INSERT INTO User (userName, userPhoneNumber, userEmail, userAddress, userPassword)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+
+      db.query(query, [userName, userPhoneNumber, userEmail, userAddress, hashedPassword], (err, result) => {
+        if (err) {
+          console.error("Database error:", err.message);
+          return res.status(500).json({ error: "Database error", details: err.message });
+        }
+
+        res.json({ success: true, message: "User registered successfully!" });
+      });
     });
   });
 });
