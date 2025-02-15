@@ -7,7 +7,6 @@ import "./Navbar.css";
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [isSignup, setIsSignup] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -31,7 +30,7 @@ const Navbar = () => {
           setShowModal(false);
         } else {
           alert("User not found! Please sign up.");
-          setIsSignup(true);
+          navigate("/register"); // Redirects to registration page
         }
       })
       .catch((err) => alert("Error logging in!"));
@@ -62,10 +61,29 @@ const Navbar = () => {
         </div>
 
         <ul className="nav-links">
-          <li><button onClick={() => onSectionClick('about')} className="nav-btn"><FaStar /> About Us</button></li>
-          <li><button onClick={() => onSectionClick('features')} className="nav-btn"><FaStar /> Features</button></li>
-          <li><button onClick={() => onSectionClick('reviews')} className="nav-btn">Reviews</button></li>
-          <li><button onClick={() => onSectionClick('contact')} className="nav-btn"><FaEnvelope /> Contact Us</button></li>
+          <li>
+            <button onClick={() => onSectionClick("about")} className="nav-btn">
+              <FaStar /> About Us
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => onSectionClick("features")}
+              className="nav-btn"
+            >
+              <FaStar /> Features
+            </button>
+          </li>
+          <li>
+            <button onClick={() => onSectionClick("reviews")} className="nav-btn">
+              Reviews
+            </button>
+          </li>
+          <li>
+            <button onClick={() => onSectionClick("contact")} className="nav-btn">
+              <FaEnvelope /> Contact Us
+            </button>
+          </li>
           <li>
             <button className="signin-btn" onClick={() => setShowModal(true)}>
               <FaSignInAlt /> Sign In
@@ -80,7 +98,7 @@ const Navbar = () => {
           <div className="modal-overlay" onClick={() => setShowModal(false)}></div>
           <div className="signin-modal">
             <FaTimes className="close-modal" onClick={() => setShowModal(false)} />
-            <h2>{isSignup ? "Sign Up" : "Login Form"}</h2>
+            <h2>Login Form</h2>
 
             <input
               type="text"
@@ -100,15 +118,21 @@ const Navbar = () => {
             </a>
 
             <button className="login-btn" onClick={handleLogin}>
-              {isSignup ? "Sign Up" : "LOGIN"}
+              LOGIN
             </button>
 
             <p className="toggle-text">
-              {isSignup ? "Already a member? " : "Not a member? "}
-              <span onClick={() => setIsSignup(!isSignup)} className="toggle-link">
-                {isSignup ? "Login now" : "Sign up now"}
+              Not a member?{" "}
+              <span
+                onClick={() => {
+                 setShowModal(false); // Close the modal
+                 navigate("/register"); // Navigate to the Register page
+              }}
+              className="toggle-link">
+                 Sign up now
               </span>
             </p>
+
           </div>
         </>
       )}

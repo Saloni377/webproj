@@ -4,27 +4,42 @@ import Navbar from "./components/Navbar";
 import SearchNavbar from "./components/SearchNavbar"; // New Navbar for search results
 import Home from "./pages/Home";
 import SearchResults from "./components/SearchResults";
+import Register from "./components/Register";
+import Login from "./components/Login";
 
 function App() {
-  const [highlightSection, setHighlightSection] = useState("");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   return (
     <Router>
-      <MainLayout onSectionClick={setHighlightSection} />
+      <Navbar user={user} setUser={setUser} />
       <Routes>
-        <Route path="/" element={<Home highlightSection={highlightSection} />} />
-        <Route path="/search" element={<SearchResults />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login setUser={setUser} />} />
       </Routes>
     </Router>
   );
 }
 
-
-// Separate component to determine which Navbar to show
+// ✅ Fix: Remove Navbar from Register Page
 const MainLayout = ({ onSectionClick }) => {
   const location = useLocation(); // Get current route
 
-  return location.pathname === "/search" ? <SearchNavbar /> : <Navbar onSectionClick={onSectionClick} />;
+  if (location.pathname === "/register") {
+    return null; // No navbar on the register page
+  } else if (location.pathname === "/search") {
+    return <SearchNavbar />;
+  } else {
+    return <Navbar onSectionClick={onSectionClick} />;
+  }
 };
 
 export default App;
