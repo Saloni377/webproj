@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSignInAlt, FaTimes, FaStar, FaEnvelope } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
@@ -9,7 +9,16 @@ const Navbar = () => {
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null); // Track logged-in user
   const navigate = useNavigate();
+
+  // Load user from localStorage when the component mounts
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   const handleSearch = () => {
     if (searchQuery.trim() !== "") {
@@ -18,7 +27,7 @@ const Navbar = () => {
   };
 
   const handleLogin = () => {
-    fetch("http://localhost:5000/api/auth/login", {
+    fetch("http://localhost:5000/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
@@ -27,20 +36,23 @@ const Navbar = () => {
       .then((data) => {
         if (data.success) {
           alert("Login Successful!");
+
+          // Save user to localStorage
+          localStorage.setItem("user", JSON.stringify(data.user));
+          setUser(data.user); // Update state
+          
           setShowModal(false);
         } else {
-          alert("User not found! Please sign up.");
-          navigate("/register"); // Redirects to registration page
+          alert("Invalid email or password!");
         }
       })
       .catch((err) => alert("Error logging in!"));
   };
 
-  const onSectionClick = (sectionId) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // Remove user from storage
+    setUser(null); // Reset user state
+    navigate("/");
   };
 
   return (
@@ -62,47 +74,61 @@ const Navbar = () => {
 
         <ul className="nav-links">
           <li>
-            <button onClick={() => onSectionClick("about")} className="nav-btn">
+            <button className="nav-btn" onClick={() => navigate("/about")}>
               <FaStar /> About Us
             </button>
           </li>
           <li>
-            <button
-              onClick={() => onSectionClick("features")}
-              className="nav-btn"
-            >
+            <button className="nav-btn" onClick={() => navigate("/features")}>
               <FaStar /> Features
             </button>
           </li>
           <li>
-            <button onClick={() => onSectionClick("reviews")} className="nav-btn">
+            <button className="nav-btn" onClick={() => navigate("/reviews")}>
               Reviews
             </button>
           </li>
           <li>
-            <button onClick={() => onSectionClick("contact")} className="nav-btn">
+            <button className="nav-btn" onClick={() => navigate("/contact")}>
               <FaEnvelope /> Contact Us
             </button>
           </li>
-          <li>
-            <button className="signin-btn" onClick={() => setShowModal(true)}>
-              <FaSignInAlt /> Sign In
-            </button>
-          </li>
+
+          {/* Show "Your Orders" button if logged in, otherwise show "Sign In" */}
+          {user ? (
+            <>
+              <li>
+                <button className="nav-btn" onClick={() => navigate("/orders")}>
+                  🛒 Your Orders
+                </button>
+              </li>
+              <li>
+                <button className="nav-btn logout-btn" onClick={handleLogout}>
+                  🚪 Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <li>
+              <button className="signin-btn" onClick={() => setShowModal(true)}>
+                <FaSignInAlt /> Sign In
+              </button>
+            </li>
+          )}
         </ul>
       </nav>
 
-      {/* Modal Popup */}
+      {/* Login Modal */}
       {showModal && (
         <>
           <div className="modal-overlay" onClick={() => setShowModal(false)}></div>
           <div className="signin-modal">
             <FaTimes className="close-modal" onClick={() => setShowModal(false)} />
-            <h2>Login Form</h2>
+            <h2>Login</h2>
 
             <input
-              type="text"
-              placeholder="Email or Phone"
+              type="email"
+              placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -113,10 +139,6 @@ const Navbar = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <a href="#" className="forgot-password">
-              Forgot Password?
-            </a>
-
             <button className="login-btn" onClick={handleLogin}>
               LOGIN
             </button>
@@ -125,14 +147,14 @@ const Navbar = () => {
               Not a member?{" "}
               <span
                 onClick={() => {
-                 setShowModal(false); // Close the modal
-                 navigate("/register"); // Navigate to the Register page
-              }}
-              className="toggle-link">
-                 Sign up now
+                  setShowModal(false); // Close the modal
+                  navigate("/register"); // Navigate to Register
+                }}
+                className="toggle-link"
+              >
+                Sign up now
               </span>
             </p>
-
           </div>
         </>
       )}

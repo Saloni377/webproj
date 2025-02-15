@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import SearchNavbar from "./components/SearchNavbar"; // New Navbar for search results
+import SearchNavbar from "./components/SearchNavbar";
 import Home from "./pages/Home";
 import SearchResults from "./components/SearchResults";
 import Register from "./components/Register";
-import Login from "./components/Login";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -19,26 +18,26 @@ function App() {
 
   return (
     <Router>
-      <Navbar user={user} setUser={setUser} />
+      <MainLayout user={user} setUser={setUser} />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login setUser={setUser} />} />
       </Routes>
     </Router>
   );
 }
 
-// ✅ Fix: Remove Navbar from Register Page
-const MainLayout = ({ onSectionClick }) => {
-  const location = useLocation(); // Get current route
+// ✅ Fix: Show Navbar only on allowed pages
+const MainLayout = ({ user, setUser }) => {
+  const location = useLocation();
 
   if (location.pathname === "/register") {
-    return null; // No navbar on the register page
+    return null; // No navbar on Register page
   } else if (location.pathname === "/search") {
     return <SearchNavbar />;
   } else {
-    return <Navbar onSectionClick={onSectionClick} />;
+    return <Navbar user={user} setUser={setUser} />;
   }
 };
 
