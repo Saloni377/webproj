@@ -69,12 +69,7 @@ const Home = ({ highlightSection }) => {
             perfect match for any event.<br />
             <br />
           </p>
-          <p>
-            At <strong>GlamGear</strong>, we value affordability, convenience, <br />
-            and sustainability. Renting instead of buying <br />
-            reduces fashion waste and promotes a more eco-friendly lifestyle.<br />
-            Join us today and redefine the way you accessorize!
-          </p>
+          
         </div>
       </section>
 

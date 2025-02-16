@@ -4,51 +4,46 @@ const bcrypt = require("bcryptjs");
 const db = require("../db");
 
 // Register Route
-router.post("/", (req, res) => {
-  console.log("Received Request Body:", req.body); // ✅ Log request body
-
+router.post("/", async (req, res) => {
+  console.log("Received Request Body:", req.body);
   const { userName, userPhoneNumber, userEmail, userAddress, userPassword } = req.body;
 
-  if (!userName?.trim() || !userPhoneNumber?.trim() || !userEmail?.trim() || !userAddress?.trim() || !userPassword?.trim()) {
+  // Validate input fields
+  if (![userName, userPhoneNumber, userEmail, userAddress, userPassword].every(field => field?.trim())) {
     return res.status(400).json({ error: "All fields are required" });
   }
-  
 
-  // Check if the email is already registered
-  const checkEmailQuery = "SELECT * FROM User WHERE userEmail = ?";
-  db.query(checkEmailQuery, [userEmail], (err, results) => {
-    if (err) {
-      console.error("Database error:", err.message);
-      return res.status(500).json({ error: "Database error" });
-    }
+  // Validate email and phone formats
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
+    return res.status(400).json({ error: "Invalid email format" });
+  }
+  if (!/^\d{10}$/.test(userPhoneNumber)) {
+    return res.status(400).json({ error: "Phone number must be 10 digits" });
+  }
 
-    if (results.length > 0) {
-      return res.status(400).json({ error: "Email is already registered" });
-    }
+  try {
+    // Check if the email is already registered
+    const [emailCheck] = await db.promise().query("SELECT * FROM User WHERE userEmail = ?", [userEmail]);
+    if (emailCheck.length) return res.status(409).json({ error: "Email is already registered" });
 
     // Hash the password
-    bcrypt.hash(userPassword, 10, (err, hashedPassword) => {
-      if (err) {
-        console.error("Error hashing password:", err.message);
-        return res.status(500).json({ error: "Error hashing password" });
-      }
+    const hashedPassword = await bcrypt.hash(userPassword, 10);
 
-      // Insert the new user
-      const query = `
-        INSERT INTO User (userName, userPhoneNumber, userEmail, userAddress, userPassword)
-        VALUES (?, ?, ?, ?, ?)
-      `;
+    // Insert new user
+    const [result] = await db.promise().query(
+      "INSERT INTO User (userName, userPhoneNumber, userEmail, userAddress, userPassword) VALUES (?, ?, ?, ?, ?)",
+      [userName, userPhoneNumber, userEmail, userAddress, hashedPassword]
+    );
 
-      db.query(query, [userName, userPhoneNumber, userEmail, userAddress, hashedPassword], (err, result) => {
-        if (err) {
-          console.error("Database error:", err.message);
-          return res.status(500).json({ error: "Database error", details: err.message });
-        }
-
-        res.json({ success: true, message: "User registered successfully!" });
-      });
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully!",
+      userId: result.insertId,
     });
-  });
+  } catch (err) {
+    console.error("Database error:", err.message);
+    res.status(500).json({ error: "Database error", details: err.message });
+  }
 });
 
 module.exports = router;

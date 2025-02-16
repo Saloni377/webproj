@@ -12,8 +12,8 @@ router.get("/search", (req, res) => {
 
   const searchTerm = `%${q}%`;
   const query = `
-    SELECT * FROM accessories
-    WHERE LOWER(name) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?)
+    SELECT * FROM Product
+    WHERE LOWER(productName) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?)
   `;
 
   db.query(query, [searchTerm, searchTerm], (err, results) => {
