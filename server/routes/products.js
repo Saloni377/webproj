@@ -30,4 +30,24 @@ router.get("/search", (req, res) => {
   });
 });
 
+router.get("/:id", (req, res) => {
+  const productId = req.params.id;
+
+  const query = `SELECT * FROM Product WHERE ProductID = ?`; // Use ProductID from the database
+
+  db.query(query, [productId], (err, results) => {
+    if (err) {
+      console.error("Error fetching product details:", err.sqlMessage);
+      return res.status(500).json({ error: "Database error", details: err.sqlMessage });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(results[0]); // Return a single product object
+  });
+});
+
+
 module.exports = router;

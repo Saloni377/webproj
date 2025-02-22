@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
-import "./SearchResults.css"; // Import CSS for styling
+import "./SearchResults.css";
+
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +18,6 @@ const SearchResults = () => {
     }
 
     fetch(`http://localhost:5000/api/products/search?q=${query}`)
-
       .then(response => {
         if (!response.ok) throw new Error("Failed to fetch data");
         return response.json();
@@ -35,7 +34,6 @@ const SearchResults = () => {
 
   return (
     <div className="search-results-container">
-
       <h2>Search Results for "{query}"</h2>
 
       {loading && <p>Loading results...</p>}
@@ -44,11 +42,15 @@ const SearchResults = () => {
       <div className="product-grid">
         {results.length > 0 ? (
           results.map(product => (
-            <div key={product.id} className="product-card">
+            <div
+              key={product.id}
+              className="product-card"
+              onClick={() => navigate(`/product/${product.ProductID}`)} // Navigate to Product Details
+            >
               <img src={`http://localhost:5000${product.image_url}`} alt={product.name} />
               <h3>{product.name}</h3>
               <p>{product.description}</p>
-              <p className="product-price">{product.price}</p>
+              <p className="product-price">${product.price}</p>
             </div>
           ))
         ) : (

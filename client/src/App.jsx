@@ -5,6 +5,7 @@ import SearchNavbar from "./components/SearchNavbar";
 import Home from "./pages/Home";
 import SearchResults from "./components/SearchResults";
 import Register from "./components/Register";
+import ProductDetails from "./components/ProductDetails";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -23,6 +24,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
       </Routes>
     </Router>
   );
@@ -34,9 +36,8 @@ const MainLayout = ({ user, setUser }) => {
 
   if (location.pathname === "/register") {
     return null; // No navbar on Register page
-  } else if (location.pathname === "/search") {
-    return <SearchNavbar />;
-  } else {
+  }
+  else {
     return <Navbar user={user} setUser={setUser} />;
   }
 };
