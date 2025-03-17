@@ -1,0 +1,115 @@
+/* BagPage.css */
+
+.bag-page {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .bag-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .bag-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .bag-image img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .bag-details {
+    flex-grow: 1;
+  }
+  
+  .bag-details h3 {
+    margin: 0;
+  }
+  
+  .quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .quantity-control button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  .quantity-control button:hover {
+    background-color: #0056b3;
+  }
+  
+  .bag-actions .remove-btn {
+    background-color: #ff4d4d;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .bag-actions .remove-btn:hover {
+    background-color: #e60000;
+  }
+  
+  .bag-total {
+    text-align: right;
+    margin-top: 20px;
+  }
+  
+  .bag-total h2 {
+    margin-bottom: 20px;
+  }
+  
+  .checkout-btn {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .checkout-btn:hover {
+    background-color: #218838;
+  }
+  
+  @media (max-width: 768px) {
+    .bag-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .bag-image img {
+      width: 100%;
+      height: auto;
+    }
+  
+    .bag-actions {
+      align-self: flex-end;
+    }
+  }
+  

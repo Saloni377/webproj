@@ -6,6 +6,10 @@ import Home from "./pages/Home";
 import SearchResults from "./components/SearchResults";
 import Register from "./components/Register";
 import ProductDetails from "./components/ProductDetails";
+import WishlistPage from "./components/WishlistPage";
+import BagPage from "./components/BagPage";
+
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -25,6 +29,9 @@ function App() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/register" element={<Register />} />
         <Route path="/product/:id" element={<ProductDetails />} />
+        <Route path="/bag" element={<BagPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/cart" element={<cart/>} />
       </Routes>
     </Router>
   );

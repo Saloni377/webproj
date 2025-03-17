@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import "./Navbar.css";
 import { Heart, ShoppingBag, UserCircle, LogIn } from "lucide-react";
@@ -73,16 +73,16 @@ const Navbar = () => {
 
         <ul className="nav-links">
           <li>
-            <div className="nav-item">
+            <Link to="/wishlist" className="nav-item">
               <Heart size={24} strokeWidth={1.5} />
               <span>Wishlist</span>
-            </div>
+            </Link>
           </li>
           <li>
-            <div className="nav-item">
-              <ShoppingBag size={24} strokeWidth={1.5} />
-              <span>Bag</span>
-            </div>
+              <Link to="/bag" className="nav-item">
+                <ShoppingBag size={24} strokeWidth={1.5} />
+                <span>Bag</span>
+              </Link>
           </li>
 
           {user ? (

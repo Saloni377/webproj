@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import "./SearchResults.css";
 
-
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q");
@@ -18,15 +17,15 @@ const SearchResults = () => {
     }
 
     fetch(`http://localhost:5000/api/products/search?q=${query}`)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) throw new Error("Failed to fetch data");
         return response.json();
       })
-      .then(data => {
+      .then((data) => {
         setResults(data);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         setError(error.message);
         setLoading(false);
       });
@@ -41,16 +40,23 @@ const SearchResults = () => {
 
       <div className="product-grid">
         {results.length > 0 ? (
-          results.map(product => (
+          results.map((product) => (
             <div
-              key={product.id}
+              key={product.ProductID}
               className="product-card"
-              onClick={() => navigate(`/product/${product.ProductID}`)} // Navigate to Product Details
+              onClick={() => navigate(`/product/${product.ProductID}`)}
             >
-              <img src={`http://localhost:5000${product.image_url}`} alt={product.name} />
-              <h3>{product.name}</h3>
-              <p>{product.description}</p>
-              <p className="product-price">${product.price}</p>
+              <a href={`/product/${product.ProductID}`}>
+                <img 
+                  src={`http://localhost:5000/images/${product.ImageURL}`} 
+                  alt={product.productName} 
+                  onClick={() => navigate(`/product/${product.ProductID}`)}
+                  onError={(e) => (e.target.src = "/images/placeholder.jpg")}
+                />
+              </a>
+              <h3>{product.productName}</h3>
+              <p>{product.Description}</p>
+              <p className="product-price">${product.PricePerDay}</p>
             </div>
           ))
         ) : (
