@@ -7,7 +7,7 @@ import SearchResults from "./components/SearchResults";
 import Register from "./components/Register";
 import ProductDetails from "./components/ProductDetails";
 import WishlistPage from "./components/WishlistPage";
-import BagPage from "./components/BagPage";
+import Cart from "./components/Cart";
 
 
 
@@ -29,7 +29,7 @@ function App() {
         <Route path="/search" element={<SearchResults />} />
         <Route path="/register" element={<Register />} />
         <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/bag" element={<BagPage />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<WishlistPage />} />
         <Route path="/cart" element={<cart/>} />
       </Routes>

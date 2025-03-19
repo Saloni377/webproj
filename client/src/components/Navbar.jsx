@@ -79,7 +79,7 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-              <Link to="/bag" className="nav-item">
+              <Link to="/cart" className="nav-item">
                 <ShoppingBag size={24} strokeWidth={1.5} />
                 <span>Bag</span>
               </Link>

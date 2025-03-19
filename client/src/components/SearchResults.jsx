@@ -36,27 +36,28 @@ const SearchResults = () => {
       <h2>Search Results for "{query}"</h2>
 
       {loading && <p>Loading results...</p>}
-      {error && <p className="error-message">Error: {error}</p>}
+      {error && <p className="error-message">❌ {error}</p>}
 
       <div className="product-grid">
         {results.length > 0 ? (
           results.map((product) => (
             <div
-              key={product.ProductID}
+              key={product.productId}
               className="product-card"
-              onClick={() => navigate(`/product/${product.ProductID}`)}
+              onClick={() => navigate(`/product/${product.productId}`)}
             >
-              <a href={`/product/${product.ProductID}`}>
-                <img 
-                  src={`http://localhost:5000/images/${product.ImageURL}`} 
-                  alt={product.productName} 
-                  onClick={() => navigate(`/product/${product.ProductID}`)}
-                  onError={(e) => (e.target.src = "/images/placeholder.jpg")}
-                />
-              </a>
+              <img
+                src={product.fullImageURL} // Use fullImageURL from API response
+                alt={product.productName}
+                onError={(e) => {
+                  if (!e.target.src.includes("placeholder.jpg")) {
+                    e.target.src = "/placeholder.jpg"; // Use a placeholder image in the public folder
+                  }
+                }}
+              />
               <h3>{product.productName}</h3>
-              <p>{product.Description}</p>
-              <p className="product-price">${product.PricePerDay}</p>
+              <p>{product.description}</p>
+              <p className="product-price">${product.pricePerDay} / day</p>
             </div>
           ))
         ) : (

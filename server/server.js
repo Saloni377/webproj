@@ -1,27 +1,29 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const path = require("path");
 
-const db = require("./db"); // Import database connection
-const loginRoutes = require("./routes/login"); // Import login route
-const registerRoutes = require("./routes/register"); // Import register route
-const productsRoutes = require("./routes/products"); // Import products route
+// Import routes
+const loginRoutes = require("./routes/login");
+const registerRoutes = require("./routes/register");
+const productsRoutes = require("./routes/products");
 const wishlistRoutes = require("./routes/wishlist");
-const bagRoutes = require("./routes/bag");
-
+const cartRoutes = require("./routes/cart");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const path = require('path');
+// Serve static files (images)
 app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use("/api/wishlist", wishlistRoutes);
-app.use("/api/bag", bagRoutes);
 
+// Use routes
 app.use("/api/login", loginRoutes);
 app.use("/api/register", registerRoutes);
 app.use("/api/products", productsRoutes);
+app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/cart", cartRoutes);
 
+// Server setup
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
