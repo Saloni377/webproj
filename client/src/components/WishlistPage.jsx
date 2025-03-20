@@ -5,46 +5,55 @@ import "./WishlistPage.css";
 
 const WishlistPage = () => {
   const [wishlist, setWishlist] = useState([]);
-  const [cart, setCart] = useState([]); // Add cart state
+  const [cart, setCart] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [removing, setRemoving] = useState({}); // Track removal state for individual items
+  const [removing, setRemoving] = useState({}); 
   const navigate = useNavigate();
-  const userId = 1; // Replace with actual logged-in user ID
-
-  // Fetch wishlist and cart items
+  
+  const userId = localStorage.getItem("userId"); // Fetch dynamic userId
+  
+  // Redirect to login if user is not logged in
   useEffect(() => {
-    fetch(`http://localhost:5000/api/wishlist/${userId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setWishlist(data.wishlist || []);
+    if (!userId) {
+      alert("Please log in to view your wishlist.");
+      navigate("/login");
+      return;
+    }
+
+    // Fetch Wishlist & Cart in Parallel
+    Promise.all([
+      fetch(`http://localhost:5000/api/wishlist/${userId}`).then((res) => res.json()),
+      fetch(`http://localhost:5000/api/cart/${userId}`).then((res) => res.json())
+    ])
+      .then(([wishlistData, cartData]) => {
+        setWishlist(wishlistData.wishlist || []);
+        setCart(cartData.cart || []);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("Wishlist fetch error:", err);
-        setError("Failed to fetch wishlist items.");
+        console.error("Error fetching data:", err);
+        setError("Failed to fetch wishlist and cart items.");
         setLoading(false);
       });
 
-    fetch(`http://localhost:5000/api/cart/${userId}`)
-      .then((response) => response.json())
-      .then((data) => setCart(data.cart || []))
-      .catch((err) => console.error("Error fetching cart:", err));
-  }, [userId]);
+  }, [userId, navigate]);
 
-  // Handle adding item to shopping bag (cart)
+  // Handle Adding Item to Shopping Bag (Cart)
   const handleAddToBag = async (item) => {
-    // Check if the item is already in the cart
-    const itemInCart = cart.find((cartItem) => cartItem.productId === item.productId);
+    if (!userId) {
+      alert("You must be logged in to add items to your bag.");
+      navigate("/login");
+      return;
+    }
 
-    if (itemInCart) {
+    if (cart.find((cartItem) => cartItem.productId === item.productId)) {
       alert("⚠️ This item is already in your shopping bag.");
       return;
     }
 
-    // Check if the item is in stock on the client side
     if (item.stockQuantity <= 0) {
-      alert("⚠️ This product is out of stock and cannot be added to the bag.");
+      alert("⚠️ This product is out of stock.");
       return;
     }
 
@@ -57,69 +66,56 @@ const WishlistPage = () => {
       });
 
       if (addResponse.ok) {
-        const data = await addResponse.json();
         alert(`🛍️ ${item.productName} added to your bag!`);
-        console.log("Added to cart:", data);
 
-        // Update stock quantity on the server
+        // Update stock quantity
         const updatedStockQuantity = item.stockQuantity - 1;
-        const stockResponse = await fetch(`http://localhost:5000/api/product/${item.productId}`, {
+        await fetch(`http://localhost:5000/api/product/${item.productId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ stockQuantity: updatedStockQuantity }),
         });
 
-        if (stockResponse.ok) {
-          // Update cart state and navigate to the shopping bag
-          setCart([...cart, { productId: item.productId, quantity: 1 }]);
-          navigate("/bag"); // Navigate to the shopping bag page
-        } else {
-          alert("❌ Failed to update stock. Please try again.");
-        }
+        setCart([...cart, { productId: item.productId, quantity: 1 }]);
+        navigate("/bag");
       } else {
-        const errorData = await addResponse.json();
-        if (errorData.message.includes("out of stock")) {
-          alert("⚠️ Not enough stock available. Please try a smaller quantity.");
-        } else {
-          alert("❌ Failed to add item to the bag. Please try again.");
-        }
+        alert("❌ Failed to add item to bag.");
       }
     } catch (error) {
       console.error("Error adding item to bag:", error);
-      alert("❌ An error occurred. Please try again.");
+      alert("❌ An error occurred.");
     }
   };
+
+  // Handle Removing Item from Wishlist
   const handleRemoveFromWishlist = async (productId) => {
     if (!userId) {
-      console.error("User ID is missing. Cannot remove item from wishlist.");
+      alert("You must be logged in to modify your wishlist.");
+      navigate("/login");
       return;
     }
-  
-    setRemoving((prevState) => ({ ...prevState, [productId]: true })); // Set loading state
-  
+
+    setRemoving((prevState) => ({ ...prevState, [productId]: true }));
+
     try {
       const response = await fetch("http://localhost:5000/api/wishlist", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, productId }), // Send required data
+        body: JSON.stringify({ userId, productId }),
       });
-  
-      const result = await response.json(); // Parse JSON response
-  
+
       if (response.ok) {
         setWishlist((prevWishlist) => prevWishlist.filter((item) => item.productId !== productId));
       } else {
-        console.error("Failed to remove item:", result.message);
         alert("❌ Failed to remove item from wishlist.");
       }
     } catch (error) {
       console.error("Error removing item:", error);
-      alert("❌ An error occurred. Please try again.");
+      alert("❌ An error occurred.");
     } finally {
       setRemoving((prevState) => ({ ...prevState, [productId]: false }));
     }
   };
-  
 
   if (loading) return <p>Loading wishlist...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -135,7 +131,7 @@ const WishlistPage = () => {
             <div key={item.productId} className="wishlist-item">
               <div className="wishlist-image">
                 <img
-                  src={`http://localhost:5000/images/${item.imageUrl}`}
+                  src={item.imageUrl ? `http://localhost:5000${item.imageUrl}` : "/placeholder.jpg"}
                   alt={item.productName}
                   onError={(e) => (e.target.src = "/placeholder.jpg")}
                 />
@@ -144,8 +140,8 @@ const WishlistPage = () => {
               <div className="wishlist-details">
                 <h3>{item.productName}</h3>
                 <p>{item.description}</p>
-                <p className={`availability ${Number(item.stockQuantity) > 0 ? "available" : "out-of-stock"}`}>
-                  {Number(item.stockQuantity) > 0 ? `✅ In Stock (${item.stockQuantity})` : "❌ Out of Stock"}
+                <p className={`availability ${item.stockQuantity > 0 ? "available" : "out-of-stock"}`}>
+                  {item.stockQuantity > 0 ? `✅ In Stock (${item.stockQuantity})` : "❌ Out of Stock"}
                 </p>
 
                 <button
@@ -163,7 +159,7 @@ const WishlistPage = () => {
                 <button
                   className="remove-btn"
                   onClick={() => handleRemoveFromWishlist(item.productId)}
-                  disabled={removing[item.productId]} // Disable while removing
+                  disabled={removing[item.productId]}
                 >
                   {removing[item.productId] ? "Removing..." : <Trash2 size={20} />}
                 </button>

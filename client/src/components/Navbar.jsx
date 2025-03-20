@@ -11,22 +11,27 @@ const Navbar = () => {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")) || null);
   const navigate = useNavigate();
 
+  // 🔄 Keep user state in sync with localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    const handleStorageChange = () => {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      setUser(storedUser);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // Handle search
   const handleSearch = () => {
     if (searchQuery.trim() !== "") {
-      navigate(`/search?q=${searchQuery}`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
 
+  // Handle login
   const handleLogin = () => {
     fetch("http://localhost:5000/api/login", {
       method: "POST",
@@ -35,11 +40,23 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log("Login Response:", data); // Debugging response
         if (data.success) {
           alert("Login Successful!");
+
+          // 🌟 Store user object and userId separately
           localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("userId", data.user.userId);  // ✅ Store userId
+          localStorage.setItem("role", data.user.role);  // ✅ Store role separately
+          console.log("Stored Role in LocalStorage:", localStorage.getItem("role"));
+
+
           setUser(data.user);
           setShowModal(false);
+
+          // 🌟 Navigate based on role
+          console.log("Navigating to:", data.user.role === "lender" ? "/lender-dashboard" : "/");
+          navigate(data.user.role === "lender" ? "/lender-dashboard" : "/");
         } else {
           alert("Invalid email or password!");
         }
@@ -47,12 +64,30 @@ const Navbar = () => {
       .catch(() => alert("Error logging in!"));
   };
 
+  // Handle logout
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("userId");  // ✅ Remove userId on logout
     setUser(null);
     setShowProfileDropdown(false);
     navigate("/");
   };
+
+  // 📌 Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showProfileDropdown &&
+        !event.target.closest(".profile-dropdown") // Changed from `.dropdown-menu`
+      ) {
+        setShowProfileDropdown(false);
+      }
+    };
+  
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [showProfileDropdown]);
+  
 
   return (
     <>
@@ -79,25 +114,27 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-              <Link to="/cart" className="nav-item">
-                <ShoppingBag size={24} strokeWidth={1.5} />
-                <span>Bag</span>
-              </Link>
+            <Link to="/cart" className="nav-item">
+              <ShoppingBag size={24} strokeWidth={1.5} />
+              <span>Bag</span>
+            </Link>
           </li>
 
           {user ? (
             <li className="profile-dropdown">
               <div
                 className="nav-item"
-                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                onClick={() => setShowProfileDropdown((prev) => !prev)}
               >
                 <UserCircle size={24} strokeWidth={1.5} />
                 <span>Profile</span>
               </div>
 
               {showProfileDropdown && (
-                <div className="dropdown-menu">
-                  <div className="dropdown-items" onClick={() => navigate("/profile")}>Your Order</div>
+                <div className="dropdown-menu-container">
+                  <div className="dropdown-items" onClick={() => navigate("/orders")}>
+                    Your Order
+                  </div>
                   <div className="dropdown-items" onClick={handleLogout}>Logout</div>
                 </div>
               )}
@@ -113,6 +150,7 @@ const Navbar = () => {
         </ul>
       </nav>
 
+      {/* Login Modal */}
       {showModal && (
         <>
           <div className="modal-overlay" onClick={() => setShowModal(false)}></div>
@@ -133,9 +171,7 @@ const Navbar = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button className="login-btn" onClick={handleLogin}>
-              LOGIN
-            </button>
+            <button className="login-btn" onClick={handleLogin}>LOGIN</button>
 
             <p className="toggle-text">
               Not a member?{" "}

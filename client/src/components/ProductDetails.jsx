@@ -108,7 +108,7 @@ const ProductDetails = () => {
         <div className="product-container">
           <div className="product-details">
             <img
-              src={`http://localhost:5000/images/${product.imageUrl}`}
+              src={`http://localhost:5000${product.imageUrl}`}
               alt={product.productName}
               className="image"
               onError={(e) => (e.target.src = "/placeholder.jpg")}

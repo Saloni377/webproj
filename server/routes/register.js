@@ -6,10 +6,10 @@ const db = require("../db");
 // Register Route
 router.post("/", async (req, res) => {
   console.log("Received Request Body:", req.body);
-  const { userName, userPhoneNumber, userEmail, userAddress, userPassword } = req.body;
+  const { userName, userPhoneNumber, userEmail, userAddress, userPassword, confirmPassword, role } = req.body;
 
   // Validate input fields
-  if (![userName, userPhoneNumber, userEmail, userAddress, userPassword].every(field => field?.trim())) {
+  if (![userName, userPhoneNumber, userEmail, userAddress, userPassword, confirmPassword].every(field => field?.trim())) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
@@ -21,6 +21,15 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Phone number must be 10 digits" });
   }
 
+  // Check if passwords match
+  if (userPassword !== confirmPassword) {
+    return res.status(400).json({ error: "Passwords do not match" });
+  }
+
+  // Ensure role is either 'renter' or 'lender'
+  const validRoles = ["renter", "lender"];
+  const userRole = validRoles.includes(role) ? role : "renter"; // Default to renter
+
   try {
     // Check if the email is already registered
     const [emailCheck] = await db.promise().query("SELECT * FROM User WHERE userEmail = ?", [userEmail]);
@@ -31,8 +40,8 @@ router.post("/", async (req, res) => {
 
     // Insert new user
     const [result] = await db.promise().query(
-      "INSERT INTO User (userName, userPhoneNumber, userEmail, userAddress, userPassword) VALUES (?, ?, ?, ?, ?)",
-      [userName, userPhoneNumber, userEmail, userAddress, hashedPassword]
+      "INSERT INTO User (userName, userPhoneNumber, userEmail, userAddress, userPassword, role) VALUES (?, ?, ?, ?, ?, ?)",
+      [userName, userPhoneNumber, userEmail, userAddress, hashedPassword, userRole]
     );
 
     res.status(201).json({

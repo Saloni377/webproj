@@ -10,6 +10,8 @@ const Register = () => {
     userEmail: "",
     userAddress: "",
     userPassword: "",
+    confirmPassword: "",
+    role: "renter", // Default role is 'renter'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -19,8 +21,8 @@ const Register = () => {
   };
 
   const validateForm = () => {
-    const { userName, userPhoneNumber, userEmail, userPassword } = formData;
-    if (!userName || !userPhoneNumber || !userEmail || !userPassword) {
+    const { userName, userPhoneNumber, userEmail, userPassword, confirmPassword } = formData;
+    if (!userName || !userPhoneNumber || !userEmail || !userPassword || !confirmPassword) {
       setError("All fields are required.");
       return false;
     }
@@ -34,6 +36,10 @@ const Register = () => {
     }
     if (userPassword.length < 6) {
       setError("Password must be at least 6 characters.");
+      return false;
+    }
+    if (userPassword !== confirmPassword) {
+      setError("Passwords do not match.");
       return false;
     }
     setError("");
@@ -55,7 +61,7 @@ const Register = () => {
       const data = await response.json();
       if (data.success) {
         alert("Registration Successful!");
-        navigate("/");
+        navigate("/login");
       } else {
         setError(data.error || "Registration failed.");
       }
@@ -76,11 +82,20 @@ const Register = () => {
         <input type="email" name="userEmail" placeholder="Email Address" value={formData.userEmail} onChange={handleChange} required />
         <input type="text" name="userAddress" placeholder="Address" value={formData.userAddress} onChange={handleChange} required />
         <input type="password" name="userPassword" placeholder="Password" value={formData.userPassword} onChange={handleChange} required />
+        <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required />
+        
+        {/* Role Selection Dropdown */}
+        <label>Register as:</label>
+        <select name="role" value={formData.role} onChange={handleChange}>
+          <option value="renter">Renter</option>
+          <option value="lender">Lender</option>
+        </select>
+
         <button type="submit" className="register-btn" disabled={loading}>
           {loading ? "Registering..." : "Register"}
         </button>
       </form>
-      <button onClick={() => navigate("/")} className="back-btn">Back to Home</button>
+      
     </div>
   );
 };

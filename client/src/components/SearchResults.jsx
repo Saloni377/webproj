@@ -40,26 +40,30 @@ const SearchResults = () => {
 
       <div className="product-grid">
         {results.length > 0 ? (
-          results.map((product) => (
-            <div
-              key={product.productId}
-              className="product-card"
-              onClick={() => navigate(`/product/${product.productId}`)}
-            >
-              <img
-                src={product.fullImageURL} // Use fullImageURL from API response
-                alt={product.productName}
-                onError={(e) => {
-                  if (!e.target.src.includes("placeholder.jpg")) {
-                    e.target.src = "/placeholder.jpg"; // Use a placeholder image in the public folder
-                  }
-                }}
-              />
-              <h3>{product.productName}</h3>
-              <p>{product.description}</p>
-              <p className="product-price">${product.pricePerDay} / day</p>
-            </div>
-          ))
+          results.map((product) => {
+            const imageUrl = product.imageUrl
+              ? `http://localhost:5000${product.imageUrl}`
+              : "/placeholder.jpg"; // Default to placeholder if image is missing
+
+            return (
+              <div
+                key={product.id || product.productId} // Ensure correct key field
+                className="product-card"
+                onClick={() => navigate(`/product/${product.id || product.productId}`)}
+              >
+                <img
+                  src={imageUrl}
+                  alt={product.productName}
+                  onError={(e) => {
+                    e.target.src = "/placeholder.jpg"; // Handle broken images
+                  }}
+                />
+                <h3>{product.productName}</h3>
+                <p>{product.description}</p>
+                <p className="product-price">${product.pricePerDay} / day</p>
+              </div>
+            );
+          })
         ) : (
           !loading && <p>No products found.</p>
         )}

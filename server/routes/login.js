@@ -13,7 +13,7 @@ router.post("/", (req, res) => {
   }
 
   // Fetch user from database by email
-  const query = "SELECT * FROM User WHERE userEmail = ?";
+  const query = "SELECT * FROM user WHERE userEmail = ?";
   db.query(query, [email], (err, results) => {
     if (err) {
       console.error("Database error:", err.message);
@@ -37,7 +37,10 @@ router.post("/", (req, res) => {
         return res.status(401).json({ error: "Invalid email or password" });
       }
 
-      // Successful login
+      // Ensure correct role key (database has 'role', not 'userRole')
+      const userRole = user.role || "renter"; // Default to 'renter' if missing
+
+      // Successful login response
       res.status(200).json({
         success: true,
         message: "Login successful",
@@ -47,6 +50,7 @@ router.post("/", (req, res) => {
           userEmail: user.userEmail,
           userPhoneNumber: user.userPhoneNumber,
           userAddress: user.userAddress,
+          role: userRole, // Correct key name
         },
       });
     });
