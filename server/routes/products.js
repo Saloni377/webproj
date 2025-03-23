@@ -11,10 +11,15 @@ router.get("/search", (req, res) => {
   }
 
   const searchTerm = `%${q}%`;
+  console.log(`🔎 Searching for: ${q}`); // Debugging log
+
   const query = `
-    SELECT *, CONCAT('http://localhost:5000/images/', imageURL) AS fullImageURL 
-    FROM Product
-    WHERE LOWER(productName) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?)
+  SELECT p.*, 
+         COALESCE(CONCAT('http://localhost:5000', p.imageUrl), '') AS fullImageURL,
+         COALESCE(u.userName, 'Unknown Lender') AS lenderName
+  FROM product p
+  LEFT JOIN user u ON p.addedByUserId = u.userId
+  WHERE p.productName LIKE ? OR p.category LIKE ?;
   `;
 
   db.query(query, [searchTerm, searchTerm], (err, results) => {
@@ -23,18 +28,23 @@ router.get("/search", (req, res) => {
       return res.status(500).json({ error: "Database error", details: err.sqlMessage });
     }
 
-    res.json(results.length > 0 ? results : []);
+    console.log(`✅ Found ${results.length} results`); // Debugging log
+    res.json(results);
   });
 });
 
 // 🔍 Get Product Details by ID
 router.get("/:id", (req, res) => {
   const productId = req.params.id;
+  console.log(`🔍 Fetching product details for ID: ${productId}`); // Debugging log
 
   const query = `
-    SELECT *, CONCAT('http://localhost:5000/images/', imageURL) AS fullImageURL 
-    FROM Product 
-    WHERE productId = ?
+    SELECT p.*, 
+           COALESCE(CONCAT('http://localhost:5000', p.imageUrl), '') AS fullImageURL,
+           COALESCE(u.userName, 'Unknown Lender') AS lenderName
+    FROM product p
+    LEFT JOIN user u ON p.addedByUserId = u.userId
+    WHERE p.productId = ?;
   `;
 
   db.query(query, [productId], (err, results) => {
@@ -50,9 +60,5 @@ router.get("/:id", (req, res) => {
     res.json(results[0]); // ✅ Return a single product object
   });
 });
-
-
-
-
 
 module.exports = router;

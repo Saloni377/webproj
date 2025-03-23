@@ -91,11 +91,11 @@ const AddProduct = ({ product, fetchProducts, onClose }) => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!validateForm()) return;
-  
-    const userId = localStorage.getItem("userId");
-  
+
+    const userId = localStorage.getItem("userId"); // Get logged-in user ID
+
     const data = new FormData();
     data.append("productName", formData.productName);
     data.append("description", formData.description);
@@ -103,41 +103,36 @@ const AddProduct = ({ product, fetchProducts, onClose }) => {
     data.append("pricePerDay", formData.pricePerDay);
     data.append("stockQuantity", formData.stockQuantity);
     data.append("availability", formData.availability);
-    data.append("addedByUserId", userId);
-  
-    // If a new image is selected, append it
+    data.append("addedByUserId", userId); // Include the lender's ID
+
     if (formData.changeImage && formData.image) {
-      data.append("image", formData.image);
+        data.append("image", formData.image);
     } else if (product?.imageUrl) {
-      data.append("existingImageUrl", product.imageUrl);
+        data.append("existingImageUrl", product.imageUrl);
     }
-  
-    console.log("Submitting Data:", Object.fromEntries(data.entries()));
-  
+
     try {
-      const url = product
-        ? `http://localhost:5000/api/edit-product/${product.productId}`
-        : "http://localhost:5000/api/addProduct";
-  
-      const method = product ? "PUT" : "POST"; // Use PUT for updates
-  
-      await axios({
-        method: method,
-        url: url,
-        data: data,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-  
-      alert(product ? "Product updated successfully!" : "Product added successfully!");
-      fetchProducts();
-      onClose();
+        const url = product
+            ? `http://localhost:5000/api/edit-product/${product.productId}`
+            : "http://localhost:5000/api/addProduct";
+        const method = product ? "PUT" : "POST";
+
+        await axios({
+            method: method,
+            url: url,
+            data: data,
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        alert(product ? "Product updated successfully!" : "Product added successfully!");
+        fetchProducts();
+        onClose();
     } catch (err) {
-      console.error("Error adding/updating product:", err.response?.data);
-      alert(err.response?.data?.error || "Failed to add/update product");
+        console.error("Error adding/updating product:", err.response?.data);
+        alert(err.response?.data?.error || "Failed to add/update product");
     }
-  };
-  
-  
+};
+
   return (
     <div className="add-product-container">
       <h2 className="form-title">{product ? "Edit Product" : "Add Product"}</h2>

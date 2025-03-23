@@ -23,7 +23,7 @@ const ProductDetails = () => {
 
   const userId = localStorage.getItem("userId") || 1; // ✅ Replace with actual logged-in user ID
 
-  // ✅ Fetch product details
+  // ✅ Fetch product details (including lender name)
   useEffect(() => {
     fetch(`http://localhost:5000/api/products/${id}`)
       .then((res) => res.json())
@@ -116,7 +116,8 @@ const ProductDetails = () => {
             <h2>{product.productName}</h2>
             <p>Category: {product.category}</p>
             <p>{product.description}</p>
-            <p>Price: ${product.pricePerDay} / day</p>
+            <p>Price: ₹{product.pricePerDay} / day</p>
+            <p>Listed by: {product.lenderName || "Unknown Lender"}</p> {/* ✅ Display lender name */}
 
             <div className="product-actions">
               <button className="wishlist-btn" onClick={handleAddToWishlist}>

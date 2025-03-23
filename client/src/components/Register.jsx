@@ -11,45 +11,69 @@ const Register = () => {
     userAddress: "",
     userPassword: "",
     confirmPassword: "",
-    role: "renter", // Default role is 'renter'
+    role: "renter",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
+  const [error, setError] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // Handle Input Change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError({ ...error, [e.target.name]: "" }); // Clear error on input change
   };
 
+  // Validate Individual Fields onBlur (when user leaves a field)
+  const validateField = (name, value) => {
+    let errorMessage = "";
+
+    switch (name) {
+      case "userName":
+        if (!value.trim()) errorMessage = "Full Name is required.";
+        else if (!/^[A-Za-z\s]+$/.test(value)) errorMessage = "Only letters are allowed.";
+        break;
+      case "userPhoneNumber":
+        if (!value.trim()) errorMessage = "Phone Number is required.";
+        else if (!/^\d{10}$/.test(value)) errorMessage = "Phone number must be 10 digits.";
+        break;
+        case "userEmail":
+          if (!value.trim()) {
+              errorMessage = "Email is required.";
+          } else if (!/^[^\s@]+@[A-Za-z]+[A-Za-z0-9.-]*\.[A-Za-z]{2,}$/.test(value)) {
+              errorMessage = "Invalid email format.";
+          }
+          break;
+      
+
+      case "userAddress":
+        if (!value.trim()) errorMessage = "Address is required.";
+        break;
+      case "userPassword":
+        if (!value.trim()) errorMessage = "Password is required.";
+        else if (value.length < 6) errorMessage = "Password must be at least 6 characters.";
+        break;
+      case "confirmPassword":
+        if (!value.trim()) errorMessage = "Confirm Password is required.";
+        else if (value !== formData.userPassword) errorMessage = "Passwords do not match.";
+        break;
+      default:
+        break;
+    }
+
+    setError((prevErrors) => ({ ...prevErrors, [name]: errorMessage }));
+  };
+
+  // Form Submit Validation
   const validateForm = () => {
-    const { userName, userPhoneNumber, userEmail, userPassword, confirmPassword } = formData;
-    if (!userName || !userPhoneNumber || !userEmail || !userPassword || !confirmPassword) {
-      setError("All fields are required.");
-      return false;
-    }
-    if (!/^[0-9]{10}$/.test(userPhoneNumber)) {
-      setError("Phone number must be 10 digits.");
-      return false;
-    }
-    if (!/^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/.test(userEmail)) {
-      setError("Invalid email format.");
-      return false;
-    }
-    if (userPassword.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return false;
-    }
-    if (userPassword !== confirmPassword) {
-      setError("Passwords do not match.");
-      return false;
-    }
-    setError("");
-    return true;
+    let errors = {};
+    Object.keys(formData).forEach((key) => validateField(key, formData[key]));
+    return Object.values(errors).every((msg) => msg === "");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
+  
     setLoading(true);
     try {
       const response = await fetch("http://localhost:5000/api/register", {
@@ -57,34 +81,90 @@ const Register = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await response.json();
-      if (data.success) {
-        alert("Registration Successful!");
-        navigate("/login");
-      } else {
-        setError(data.error || "Registration failed.");
+      if (!response.ok) {
+        setError({ server: data.error || "Registration failed." });
+        setLoading(false);
+        return;
       }
-    } catch (error) {
-      setError("Error connecting to server.");
+  
+      alert("Registration Successful!");
+      navigate("/login");
+    } catch (err) {
+      setError({ server: "Error connecting to server. Please try again later." });
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="register-container">
       <h2>Register</h2>
-      {error && <p className="error-message">{error}</p>}
+      {error.server && <p className="error-message">{error.server}</p>}
+
       <form onSubmit={handleSubmit} className="register-form">
-        <input type="text" name="userName" placeholder="Full Name" value={formData.userName} onChange={handleChange} required />
-        <input type="tel" name="userPhoneNumber" placeholder="Phone Number" value={formData.userPhoneNumber} onChange={handleChange} required />
-        <input type="email" name="userEmail" placeholder="Email Address" value={formData.userEmail} onChange={handleChange} required />
-        <input type="text" name="userAddress" placeholder="Address" value={formData.userAddress} onChange={handleChange} required />
-        <input type="password" name="userPassword" placeholder="Password" value={formData.userPassword} onChange={handleChange} required />
-        <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} required />
-        
-        {/* Role Selection Dropdown */}
+        <input
+          type="text"
+          name="userName"
+          placeholder="Full Name"
+          value={formData.userName}
+          onChange={handleChange}
+          onBlur={(e) => validateField(e.target.name, e.target.value)}
+        />
+        {error.userName && <p className="error-text">{error.userName}</p>}
+
+        <input
+          type="tel"
+          name="userPhoneNumber"
+          placeholder="Phone Number"
+          value={formData.userPhoneNumber}
+          onChange={handleChange}
+          onBlur={(e) => validateField(e.target.name, e.target.value)}
+        />
+        {error.userPhoneNumber && <p className="error-text">{error.userPhoneNumber}</p>}
+
+        <input
+          type="email"
+          name="userEmail"
+          placeholder="Email Address"
+          value={formData.userEmail}
+          onChange={handleChange}
+          onBlur={(e) => validateField(e.target.name, e.target.value)}
+        />
+        {error.userEmail && <p className="error-text">{error.userEmail}</p>}
+
+        <input
+          type="text"
+          name="userAddress"
+          placeholder="Address"
+          value={formData.userAddress}
+          onChange={handleChange}
+          onBlur={(e) => validateField(e.target.name, e.target.value)}
+        />
+        {error.userAddress && <p className="error-text">{error.userAddress}</p>}
+
+        <input
+          type="password"
+          name="userPassword"
+          placeholder="Password"
+          value={formData.userPassword}
+          onChange={handleChange}
+          onBlur={(e) => validateField(e.target.name, e.target.value)}
+        />
+        {error.userPassword && <p className="error-text">{error.userPassword}</p>}
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          onBlur={(e) => validateField(e.target.name, e.target.value)}
+        />
+        {error.confirmPassword && <p className="error-text">{error.confirmPassword}</p>}
+
         <label>Register as:</label>
         <select name="role" value={formData.role} onChange={handleChange}>
           <option value="renter">Renter</option>
@@ -95,7 +175,6 @@ const Register = () => {
           {loading ? "Registering..." : "Register"}
         </button>
       </form>
-      
     </div>
   );
 };

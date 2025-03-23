@@ -11,21 +11,21 @@ const products = [
     id: 1,
     name: 'Elegant Earrings',
     description: 'Beautifully crafted earrings perfect for any occasion.',
-    price: '100/day',
+    //price: '100/day',
     image: earringImage
   },
   {
     id: 2,
     name: 'Classic Necklace',
     description: 'A timeless necklace to complement your style.',
-    price: '200/day',
+    //price: '200/day',
     image: necklaceImage
   },
   {
     id: 3,
     name: 'Stylish Bracelet',
     description: 'Add a touch of elegance with this stylish bracelet.',
-    price: '150/day',
+   // price: '150/day',
     image: braceletImage
   }
 ];
@@ -67,6 +67,7 @@ const Home = ({ highlightSection }) => {
             Our platform offers a wide selection of earrings, necklaces, <br />
             bracelets, and more—ensuring you always find the <br />
             perfect match for any event.<br />
+            <br />Search the product that you want to rent and get you accessories delivered at your doorstep.
             <br />
           </p>
           
@@ -83,7 +84,7 @@ const Home = ({ highlightSection }) => {
               <h3>{product.name}</h3>
               <p>{product.description}</p>
               <p className="product-price">{product.price}</p>
-              <button className="rent-button">Rent Now</button>
+              <button className="rent-button">View</button>
             </div>
           ))}
         </div>
@@ -102,12 +103,8 @@ const Home = ({ highlightSection }) => {
             Have any questions or need assistance? Reach out to us!  
             We’d love to hear from you and help in any way we can.
           </p>
-          <form className="contact-form">
-            <input type="text" placeholder="Your Name" required />
-            <input type="email" placeholder="Your Email" required />
-            <textarea placeholder="Your Message" rows="4" required></textarea>
-            <button type="submit">Send Message</button>
-          </form>
+          <p>Contact: 78xxxxxxxx</p>          
+          <p>Email: saloni112@gmail.com</p>
         </div>
       </section>
     </div>

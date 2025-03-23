@@ -112,52 +112,26 @@
 }
 
 .contact-section {
-  background: linear-gradient(to right, #8B0000, #000); /* Dark Red to Black */
-  color: white;  
-  padding: 30px 10px;  /* Reduced padding */
+  background: linear-gradient(to right, #660000, #000); /* Dark Red to Black */
+  color: white;
+  padding: 40px 15px; /* Adjusted padding */
   text-align: center;
+  font-family: Arial, sans-serif;
 }
 
 .contact-content {
-  max-width: 500px;  /* Smaller container */
+  max-width: 500px; /* Keep it compact */
   margin: auto;
 }
 
 .contact-content h2 {
-  font-size: 2rem;  /* Smaller heading */
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .contact-content p {
-  font-size: 1rem;  /* Smaller paragraph */
-}
-
-.contact-form input,
-.contact-form textarea {
-  width: 90%;  /* Reduce width */
-  padding: 8px;  /* Smaller input fields */
-  margin: 8px 0;
-  border: none;
-  border-radius: 5px;
-}
-
-.contact-form input {
-  background: #fff5f5;
-}
-
-.contact-form textarea {
-  background: #fff5f5;
-}
-
-.contact-form button {
-  background-color: #b22222;
-  color: white;
-  padding: 8px 15px;  /* Smaller button */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.contact-form button:hover {
-  background-color: #8b0000;
+  font-size: 1.1rem;
+  line-height: 1.5; /* Better spacing */
+  margin-bottom: 10px;
 }

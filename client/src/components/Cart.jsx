@@ -166,7 +166,7 @@ const Cart = () => {
               <div className="cart-details">
                 <h3>{item.productName}</h3>
                 <p>{item.description}</p>
-                <p>Price per day: ${Number(item.pricePerDay).toFixed(2)}</p>
+                <p>Price per day: ₹{Number(item.pricePerDay).toFixed(2)}</p>
                 <div className="quantity-control">
                   <button onClick={() => handleQuantityChange(item.cartId, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
                   <span>{item.quantity}</span>
@@ -181,7 +181,7 @@ const Cart = () => {
             </div>
           ))}
           <div className="cart-total">
-            <h2>Total: ${calculateTotal()}</h2>
+            <h2>Total: ₹{calculateTotal()}</h2>
             <button className="checkout-btn" onClick={handleProceedToCheckout} disabled={!userId || (localStorage.getItem("role") !== "renter" && localStorage.getItem("role") !== null)}>Proceed to Checkout</button>
           </div>
         </div>

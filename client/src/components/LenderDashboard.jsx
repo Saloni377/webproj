@@ -129,7 +129,7 @@ const LenderDashboard = () => {
                 />
                 <h3>{product.productName}</h3>
                 <p>{product.description}</p>
-                <p>Price: ${product.pricePerDay}/day</p>
+                <p>Price: ₹{product.pricePerDay}/day</p>
                 <button onClick={() => handleEdit(product)}>Edit</button>
                 <button onClick={() => handleDelete(product.productId)} className="delete-btn">Delete</button>
               </div>

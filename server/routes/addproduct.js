@@ -8,7 +8,7 @@ const db = require("../db"); // Ensure MySQL connection is set up
 // Ensure the "images" directory exists
 const imageDir = path.join(__dirname, "../images");
 if (!fs.existsSync(imageDir)) {
-  fs.mkdirSync(imageDir, { recursive: true }); // Create the directory if it doesn't exist
+  fs.mkdirSync(imageDir, { recursive: true });
 }
 
 // Multer Storage for Image Uploads
@@ -74,12 +74,16 @@ router.post("/addProduct", upload.single("image"), (req, res) => {
   }
 });
 
-
-// Lender Products Route
+// Lender Products Route (Includes Lender Name)
 router.get("/lender-products/:lenderId", (req, res) => {
   const lenderId = req.params.lenderId;
 
-  const sql = "SELECT * FROM product WHERE addedByUserId = ?";
+  const sql = `
+    SELECT p.*, u.userName AS lenderName 
+    FROM product p
+    JOIN user u ON p.addedByUserId = u.userId
+    WHERE p.addedByUserId = ?`;
+
   db.query(sql, [lenderId], (err, result) => {
     if (err) {
       console.error("Error fetching products:", err);

@@ -60,7 +60,7 @@ const SearchResults = () => {
                 />
                 <h3>{product.productName}</h3>
                 <p>{product.description}</p>
-                <p className="product-price">${product.pricePerDay} / day</p>
+                <p className="product-price">₹{product.pricePerDay} / day</p>
               </div>
             );
           })

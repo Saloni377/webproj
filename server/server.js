@@ -11,7 +11,7 @@ const wishlistRoutes = require("./routes/wishlist");
 const cartRoutes = require("./routes/cart");
 const addProductRoutes = require("./routes/addProduct"); 
 const orderRoutes = require("./routes/orders");
-
+const reviewRoutes = require("./routes/reviews"); // Add the review route
 
 const app = express();
 app.use(cors());
@@ -22,7 +22,7 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Use routes
 app.use("/api/orders", orderRoutes); // Add order routes
-
+app.use("/api/reviews", reviewRoutes);  // Add review routes here
 app.use("/api", addProductRoutes);
 app.use("/api/login", loginRoutes);
 app.use("/api/register", registerRoutes);
